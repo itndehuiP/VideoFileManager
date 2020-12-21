@@ -47,12 +47,43 @@ public struct VideoFileManager {
             return directoryPath(createIfNeeded: createIfNeeded).appendingPathComponent(id).appendingPathExtension("MP4")
         }
     }
-    
-    public func saveVideo(url: URL?, album: String? = nil, id: String?) -> URL? {
+    /**
+     Saves data to file, obtaining the data from the url passed.
+     - Parameters:
+     - Precondition: there must be valid data in the URL passed, valid id,
+     - URL: The url where the data to saved is located. This should be a local URL.
+     - album: the name of the folder where the data should be saved, if nil is passed, the data will be saved wihout a folder.
+     - id: The name under wich the data will be saved.
+     - removeFromOrigin: default value to true, if true removes data from the URL passed.
+     - returns: Returns the URL where the data was saved.
+     - Note: The URL returned just works per session, use the method LoadVideoInfo for recover the data saved.
+     */
+    public func saveVideo(url: URL?, album: String? = nil, id: String?, removeFromOrigin: Bool = true) -> URL? {
         guard let url = url, let data = try? Data(contentsOf: url), let id = id, let dataPath = dataDirectoryPath(album: album, with: id, createIfNeeded: true) else { return nil }
         do {
             try data.write(to: dataPath)
-            deleteData(originalURL: url)
+            if removeFromOrigin {
+                deleteData(originalURL: url)
+            }
+        } catch {
+            print("Couldn't write to save file: " + error.localizedDescription)
+        }
+        return dataPath
+    }
+    /**
+     Saves data to file
+     - Parameters:
+     - Precondition: the data passed must be valid, as well as the id.
+     - data: the data to save.
+     - album: the name of the folder where the data should be saved, if nil is passed, the data will be saved wihout a folder.
+     - id: The name under wich the data will be saved.
+     - returns: Returns the URL where the data was saved.
+     - Note: The URL returned just works per session, use the method LoadVideoInfo for recover the data saved.
+     */
+    public func saveVideo(data: Data?, album: String? = nil, id: String?) -> URL? {
+        guard let data = data, let id = id, let dataPath = dataDirectoryPath(album: album, with: id, createIfNeeded: true) else { return nil }
+        do {
+            try data.write(to: dataPath)
         } catch {
             print("Couldn't write to save file: " + error.localizedDescription)
         }
