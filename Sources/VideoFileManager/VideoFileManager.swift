@@ -18,7 +18,8 @@ public struct VideoFileManager {
                                                       withIntermediateDirectories: true,
                                                       attributes: nil)
             } catch {
-                  print("Couldn't create directory \(error.localizedDescription)")
+                let description = "Couldn't create directory \(error.localizedDescription)"
+                print("Video File Manager [Info]: \(description)")
             }
         }
         return directoryPath
@@ -32,7 +33,8 @@ public struct VideoFileManager {
                                                         withIntermediateDirectories: true,
                                                         attributes: nil)
             } catch {
-                print("Couldn't create directory \(error.localizedDescription)")
+                let description = "Couldn't create Album directory \(error.localizedDescription)"
+                print("Video File Manager [Info]: \(description)")
             }
         }
         return albumDirectoryURL
@@ -66,7 +68,8 @@ public struct VideoFileManager {
                 deleteData(originalURL: url)
             }
         } catch {
-            print("Couldn't write to save file: " + error.localizedDescription)
+            let description = "Couldn't save data from url with id: \(id) \(error.localizedDescription)"
+            print("Video File Manager [Info]: \(description)")
         }
         return dataPath
     }
@@ -85,7 +88,8 @@ public struct VideoFileManager {
         do {
             try data.write(to: dataPath)
         } catch {
-            print("Couldn't write to save file: " + error.localizedDescription)
+            let description = "Couldn't save data with id: \(id) \(error.localizedDescription)"
+            print("Video File Manager [Info]: \(description)")
         }
         return dataPath
     }
@@ -100,7 +104,8 @@ public struct VideoFileManager {
         do {
             try FileManager.default.removeItem(at: directoryPath(createIfNeeded: false))
         } catch {
-            print("Error Deleting Folder. " + error.localizedDescription)
+            let description = "Failed to delete main folder \(error.localizedDescription)"
+            print("Video File Manager [Info]: \(description)")
         }
     }
     
@@ -109,7 +114,8 @@ public struct VideoFileManager {
         do {
             try FileManager.default.removeItem(at: albumPath)
         } catch {
-            print("Error Deleting Folder. " + error.localizedDescription)
+            let description = "Failed to delete album folder: \(album). \(error.localizedDescription)"
+            print("Video File Manager [Info]: \(description)")
         }
     }
     
@@ -118,7 +124,8 @@ public struct VideoFileManager {
         do {
             try FileManager.default.removeItem(at: dataPath)
         } catch {
-            print("Error Deleting Folder. " + error.localizedDescription)
+            let description = "Failed to delete data with id \(id). \(error.localizedDescription)"
+            print("Video File Manager [Info]: \(description)")
         }
     }
     
@@ -126,7 +133,8 @@ public struct VideoFileManager {
         do {
             try FileManager.default.removeItem(at: originalURL)
         } catch {
-            print("Error deleting from temporary. " + error.localizedDescription)
+            let description = "Failed to delete data in url passed. \(error.localizedDescription)"
+            print("Video File Manager [Info]: \(description)")
         }
     }
 
