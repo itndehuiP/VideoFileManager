@@ -5,6 +5,7 @@ public struct VideoFileManager {
     public init() {}
     private let mainFolder = "VideoFileManager"
     
+    /// Creates the main directory path.
     private var directoryPath: URL {
       let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
       let folderDirectoryURL = paths.first!.appendingPathComponent(mainFolder)
@@ -24,7 +25,13 @@ public struct VideoFileManager {
         }
         return directoryPath
     }
-    
+    /**
+     Consults the corresponding path, using the album received.
+     - Parameters:
+     - album: The name of the directory consultated,
+     - createIfNeeded: Bool value indicating whether the directory should be created if it doesn't exists.
+     - returns: An optional URL, the corresponding URL if the consult was succesfull, and nil if it wasn't.
+     */
     private func albumDirectoryPath(album: String, createIfNeeded: Bool) -> URL? {
         let albumDirectoryURL = directoryPath(createIfNeeded: createIfNeeded).appendingPathComponent(album, isDirectory: true)
         if createIfNeeded {
@@ -39,7 +46,14 @@ public struct VideoFileManager {
         }
         return albumDirectoryURL
     }
-    
+    /**
+     Consults the corresponding path, using the album and id received.
+     - Parameters:
+     - album: The name of the directory consultated
+     - id: The path component of the diretory consultated.
+     - createIfNeeded: Bool value indicating whether the directory should be created if it doesn't exists.
+     - returns: An optional URL, the corresponding URL if the consult was succesfull, and nil if it wasn't.
+     */
     private func dataDirectoryPath(album: String? = nil, with id: String, createIfNeeded: Bool) -> URL? {
         guard !id.isEmpty else { return nil }
         if let album = album {
@@ -94,6 +108,14 @@ public struct VideoFileManager {
         return dataPath
     }
     
+    /**
+     Loads the info saved with the parameters passed.
+     - Parameters:
+     - album: The name of the directory where the data should be found.
+     - id: The name under which the data should be found.
+     - recoverData: Bool value indicating whether the data, in case of have been found should be retrieved.
+     - returns: A tuple, with an optional URL (nil if the data wasn't found) for accessing the data (just valid fot the session), and the data found.
+     */
     public func loadVideoInfo(album: String? = nil, id: String?, recoverData: Bool = false) -> (URL?, Data?) {
         guard let id = id, let dataPath = dataDirectoryPath(album: album, with: id, createIfNeeded: false) else { return (nil, nil) }
         return (dataPath, recoverData ? try? Data(contentsOf: dataPath) : nil)
@@ -108,9 +130,13 @@ public struct VideoFileManager {
             print("Video File Manager [Info]: \(description)")
         }
     }
-    
+    /**
+     Deletes the main folder with all the data that it contains.
+     - note: It deletes all the data saved using this manager.
+     */
     public func delete(album: String) {
-        guard let albumPath = albumDirectoryPath(album: album, createIfNeeded: false) else { return }
+        guard let albumPath = albumDirectoryPath(album: album, createIfNeeded: false),
+        fileExists(path: albumPath.absoluteString) else { return }
         do {
             try FileManager.default.removeItem(at: albumPath)
         } catch {
@@ -120,7 +146,8 @@ public struct VideoFileManager {
     }
     
     public func deleteVideo(album: String? = nil, id: String?) {
-        guard let id = id, let dataPath = dataDirectoryPath(album: album, with: id, createIfNeeded: false) else { return }
+        guard let id = id, let dataPath = dataDirectoryPath(album: album, with: id, createIfNeeded: false),
+              fileExists(path: dataPath.absoluteString) else { return }
         do {
             try FileManager.default.removeItem(at: dataPath)
         } catch {
@@ -128,8 +155,11 @@ public struct VideoFileManager {
             print("Video File Manager [Info]: \(description)")
         }
     }
-    
+    /**
+     Deletes the data in the received url.
+     */
     private func deleteData(originalURL: URL) {
+        guard fileExists(path: originalURL.absoluteString) else { return }
         do {
             try FileManager.default.removeItem(at: originalURL)
         } catch {
@@ -138,4 +168,7 @@ public struct VideoFileManager {
         }
     }
 
+    private func fileExists(path: String) -> Bool {
+        FileManager.default.fileExists(atPath: path)
+    }
 }
