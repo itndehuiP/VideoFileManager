@@ -136,7 +136,7 @@ public struct VideoFileManager {
      */
     public func delete(album: String) {
         guard let albumPath = albumDirectoryPath(album: album, createIfNeeded: false),
-        fileExists(path: albumPath.absoluteString) else { return }
+        fileExists(path: albumPath.path) else { return }
         do {
             try FileManager.default.removeItem(at: albumPath)
         } catch {
@@ -147,7 +147,7 @@ public struct VideoFileManager {
     
     public func deleteVideo(album: String? = nil, id: String?) {
         guard let id = id, let dataPath = dataDirectoryPath(album: album, with: id, createIfNeeded: false),
-              fileExists(path: dataPath.absoluteString) else { return }
+              fileExists(path: dataPath.path) else { return }
         do {
             try FileManager.default.removeItem(at: dataPath)
         } catch {
@@ -159,7 +159,7 @@ public struct VideoFileManager {
      Deletes the data in the received url.
      */
     private func deleteData(originalURL: URL) {
-        guard fileExists(path: originalURL.absoluteString) else { return }
+        guard fileExists(path: originalURL.path) else { return }
         do {
             try FileManager.default.removeItem(at: originalURL)
         } catch {
